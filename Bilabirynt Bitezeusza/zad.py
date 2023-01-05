@@ -3,68 +3,49 @@ import numpy as np
 from typing import List
 
 
-def BB(
-    l_potworow: int, exp_potworow: List[int], i: int = 0, exp: int = 0, krok: int = 3
-):
+def BB(l_potworow: int, exp_potworow: List[int]):
+    """
+    Jezeli polaczenie z najlepsza mozliwa strategia jest mniejsze niz najlepsza strategia,
+    to dodaj najlepsza strategie do listy strategii
+    w przeciwnym wypadku dodaj polaczenie z najlepsza mozliwa strategia.
+    Finalnie wez wartosc ostatniej strategi z listy strategii.
+    """
+    trasa = [(0, 0)] + list(enumerate(exp_potworow, 1))
+    strategie = [trasa[0], trasa[1]]
 
-    if i > l_potworow:
-        return exp
+    for i in range(2, l_potworow + 1):
+        pivot = trasa[i]
 
-    print(i)
-    # niech sprawdza najlepsza pare rozwiazan o 3 kroki wprzód
-    tab = exp_potworow[i : i + krok]
+        mozliwe_strategie_max = max(
+            list(filter(lambda tup: abs(tup[0] - pivot[0]) > 1, strategie)),
+            key=lambda x: x[1],
+        )
 
-    print(tab)
+        strategie_max = max(strategie, key=lambda x: x[1])
 
-    para = tab[0] + tab[2]
-    print(tab[0], tab[2])
+        if pivot[1] + mozliwe_strategie_max[1] < strategie_max[1]:
+            strategie += [strategie_max]
+        else:
+            strategie += [(i, pivot[1] + mozliwe_strategie_max[1])]
 
-    singiel = tab[1]
-    print(tab[1])
-
-    if para > singiel:
-        print("para")
-
-        exp += para
-        i += i + 3
-        print("i", i)
-        BB(l_potworow=l_potworow, exp_potworow=exp_potworow, i=i, exp=exp)
-    else:
-        print("singiel")
-
-        exp += singiel
-        i += i + 1
-        print("i", i)
-        BB(l_potworow=l_potworow, exp_potworow=exp_potworow, i=i, exp=exp)
+    return strategie[-1][1]
 
 
-labirynt_1 = [5, [1, 2, 3, 4, 5]]
+# Przykładowe labirynty
+labirynt_lab = [4, [2, 1, 1, 5]]  # 7
+labirynt_1 = [5, [1, 2, 3, 4, 5]]  # 9
+labirynt_2 = [6, [0, 2, 1, 1, 5, 0]]  # 7
+with open("./input.txt") as f:
+    input = f.readlines()
+input = [int(input[0]), [int(x) for x in input[1].split(" ")]]
+input  # 8643968
 
-BB(labirynt_1[0], labirynt_1[1])
-
-# 4
-# 2,1,1,5
-
-# i = 0 (2)
-# mamy 0 expa
-# do wyboru jest 0 lub 2 expa
-# zapisujemy scenariusze
-# [0,2]
-
-# i = 1 (1)
-# mamy [0,2] expa
-# do wyboru jest 0 + 1 lub 2 + 0
-# zapisujemy lepszy wybór
-# [0,2,2]
-
-# i = 2 (1)
-# mamy [0,2,2] expa
-# do wyboru mamy 2 + 1 lub 0 + 1
-# zapisujemy lepszy wybór
-# [0,2,2,3]
-
-# i = 3 (5)
-# mamy [0,2,2,3] expa
-# do wyboru jest
-
-# 0,2,2,3,7
+# Testowanie
+# test 1
+print("Wynik testu:", BB(labirynt_lab[0], labirynt_lab[1]) == 7)
+# test 2
+print("Wynik testu:", BB(labirynt_1[0], labirynt_1[1]) == 9)
+# test 3
+print("Wynik testu:", BB(labirynt_2[0], labirynt_2[1]) == 7)
+# test ostateczny
+print("Wynik testu:", BB(input[0], input[1]) == 8643968)
