@@ -218,6 +218,7 @@ class WordleEnv(gym.Env):
 
         return self.state
 
+    # TODO Dodać oraniczanie stanów w przypadku trafienia w odpowiednią literę oraz profitować za szybsze rozwiązywanie
     def render(self, mode: str = "human"):
         """Renders the Wordle environment.
 
@@ -298,7 +299,7 @@ class WordleEnv(gym.Env):
         # Total reward equals -(number of incorrect guesses)
         # reward = 120.0 if correct else reward
         if correct:
-            reward = 121.0
+            reward = 121.0  # + (6 - self.n_rounds) * 60
         elif game_over:
             reward = -35
         elif check in self.answers:
